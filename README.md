@@ -1,3 +1,3 @@
 # go_web
 
-asdfasdf
+My journey becoming a gopher
