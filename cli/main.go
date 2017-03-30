@@ -1,9 +1,10 @@
 package main
 
 import (
-	"crypto/rand"
+	//"crypto/rand"
 	"fmt"
-	"math/big"
+	//"math/big"
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -17,13 +18,16 @@ func main() {
 	var win bool = false
 	var lose bool = false
 	var slice = make([]string, noOfDigits)
-	var n *big.Int
-	var err error
-	max := *big.NewInt(99999999999)
 
 	slice = []string{"", "", "", ""}
 	question = createQuestion(noOfDigits, slice)
 	fmt.Println("question is :", question)
+
+	tryAdd := add(1, 2)
+	fmt.Println(tryAdd())
+	fmt.Println(tryAdd())
+	fmt.Println(tryAdd())
+	fmt.Println(tryAdd())
 
 	for {
 		fmt.Printf("Attempt #%d. Guess the numbers: ", attempts)
@@ -133,20 +137,21 @@ func createQuestion(noOfDigits int, slice []string) string {
 	fmt.Println(slice)
 	//for {
 	for i := 0; i < noOfDigits; i++ {
+		fmt.Println("*********", "loop #", i)
 		newNumber = generateNewNumber(newNumber, slice)
-		fmt.Println(newNumber)
+		fmt.Println("NewNumber generated - ", newNumber)
 		if strconv.Itoa(newNumber) == slice[i] {
 			fmt.Println(newNumber, " equals ", slice[i])
 			createQuestion(noOfDigits, slice)
 		} else {
-			fmt.Println(newNumber, " not equals ", slice[i])
+			fmt.Println(newNumber, " not equals slice #", i, slice[i])
 			if slice[i] == "" {
 				slice[i] = strconv.Itoa(newNumber)
-
 			}
 		}
+
+		fmt.Println("so it will be ", slice)
 	}
-	fmt.Println(slice)
 	//if arrayFilledUp(slice, noOfDigits) {
 	//	break
 	//}
@@ -162,23 +167,28 @@ func generateNewNumber(newNumber int, slice []string) int {
 	fmt.Println(newNumber, slice)
 	var newNumber2 int
 	for _, v := range slice {
+		fmt.Println("IS ", strconv.Itoa(newNumber), " equals to ", v)
+
 		if strconv.Itoa(newNumber) == v {
 			//Generate a new number please
-			//s1 := rand.NewSource(time.Now().UnixNano())
-			//r1 := rand.New(s1)
+			fmt.Println("It is equal so create a new number2")
+			s1 := rand.NewSource(time.Now().UnixNano())
+			r1 := rand.New(s1)
 
-			n, err = rand.Int(rand.Reader, &max)
-			fmt.Println("newnumber2 - ", n)
+			//n, err = rand.Int(rand.Reader, &max)
 			newNumber2 = r1.Intn(9)
+			fmt.Println("newnumber2 - ", newNumber2)
 			generateNewNumber(newNumber2, slice)
 			break
 		} else {
 			//
-			fmt.Println(newNumber, slice, "not exists")
-			return newNumber
+			fmt.Println(newNumber, "not exists in", slice)
+			newNumber2 = newNumber
+
 		}
 	}
-	return 0
+	fmt.Println("?????", newNumber2)
+	return newNumber2
 }
 
 func arrayFilledUp(slice []string, noOfDigits int) bool {
@@ -188,4 +198,12 @@ func arrayFilledUp(slice []string, noOfDigits int) bool {
 		}
 	}
 	return true
+}
+
+func add(x int, y int) func() int {
+	a := 0
+	return func() int {
+		a++
+		return a
+	}
 }
