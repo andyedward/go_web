@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import shortid from 'shortid';
 import ChannelSection from './channels/ChannelSection.jsx'
 import UserSection from './users/UserSection.jsx'
 import MessageSection from './messages/MessageSection.jsx'
+import Socket from './socket.js';
 
 class App extends Component {
 	constructor(props) {
@@ -13,15 +14,65 @@ class App extends Component {
 			users:[],
 			activeUser:{},
 			messages:[],
-			activeChannelMessages: []
+			activeChannelMessages: [],
+			connected: false
 		}
 	}
-	addChannel(name) {
+	componentDidMount() {
+		let socket = this.socket = new Socket();
+		socket.on('connect', this.onConnect.bind(this));
+		socket.on('disconnect', this.onDisconnect.bind(this));
+		socket.on('channel add', this.onAddChannel.bind(this));
+		socket.on('user add', this.onAddUser.bind(this));
+		socket.on('user edit', this.onEditUser.bind(this));
+		socket.on('user remove', this.onRemoveUser.bind(this));
+		socket.on('message add', this.onMessageAdd.bind(this));
+	}
+	onMessageAdd(message) {
+		let {messages} = this.state;
+		messages.push({message});
+		this.setState({messages});
+	}
+	onRemoveUser(removeUser) {
+		let {users} = this.state;
+		users = users.filter(user => {
+			return user.id !== removeUser.id;
+		});
+		this.setState({users});
+	}
+	onAddUser(user) {
+		let {users} = this.state;
+		users.push(user);
+		this.setState({users});
+	}
+	onEditUser(editUser) {
+		let {users} = this.state;
+		users = users.map(user =>{
+			if(editUser.id === user.id) {
+				return editUser;
+			}
+			return user;
+		});
+		this.setState({users});
+
+	}
+	onConnect() {
+		this.setState({connected:true});
+		this.socket.emit('channel subscribe');
+		this.socket.emit('user subscribe');
+	}
+	onDisconnect() {
+		this.setState({connected:false});
+	}	
+	onAddChannel(channel) {
 		let {channels} = this.state;
 		var shortid = require('shortid');
-		channels.push({id: shortid.generate(), name})
-		this.setState({channels});
-		// TODO :send to server
+
+		channels.push({id: channel.id, name: channel.name});
+		this.setState({channels})
+	}
+	addChannel(name) {
+		this.socket.emit('channel add',{name})
 	}
 	addUser(userName) {
 		let {users} = this.state;
@@ -30,13 +81,20 @@ class App extends Component {
 		this.setState({users});
 	}
 	addMessage(message, userName, channel) {
-		let {messages} = this.state;
+		/*let {messages} = this.state;
 		let {activeChannelMessages} = this.state;
 		var shortid = require('shortid');
 		messages.push({id: shortid.generate(), msg:message, user:userName, chn: channel, time: new Date().toString() })
 		activeChannelMessages.push({id: shortid.generate(), msg:message, user:userName, chn: channel, time: new Date().toString() })
-		this.setState({messages});
+		this.setState({messages});*/
+
+		let {activeChannel} = this.state;
+		this.socket.emit('message add',
+		{
+			channelId: activeChannel.id, body
+		});
 	}
+
 	
 	setChannel(activeChannel) {
 
@@ -62,12 +120,20 @@ class App extends Component {
 		}
 		
 		this.setState({activeChannelMessages})
-		
+		this.socket.emit('message unsubscribe');
+		this.setState({messages:[]});
+		this.socket.emit('messages subscribe', {
+			channelId:activeChannel.id
+		});
 		
 	}
 	setUserActive(activeUser) {
 		this.setState({activeUser})
 	}
+	setUserName(name) {
+		this.socket.emit('user edit', {name});
+	}
+
 	render() {
 		return(
 			<div className='app'>
