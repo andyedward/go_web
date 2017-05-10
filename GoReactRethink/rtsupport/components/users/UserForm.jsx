@@ -3,9 +3,9 @@ import React,{Component}from 'react';
 class UserForm extends Component {
 	onSubmit(e) {
 		e.preventDefault();
-		const node = this.refs.user;
+		const node = this.refs.userName;
 		const userName = node.value;
-		this.props.addUser(userName);
+		this.props.setUserName(userName);
 		node.value='';
 	}
 	render() {
@@ -14,8 +14,8 @@ class UserForm extends Component {
 				<div className='form-group'>
 				<input 
 					className='form-control'
-					placeholder='Add User'
-					ref = "user"
+					placeholder='Set your name'
+					ref = "userName"
 					type="text" />
 				</div>
 			</form>
@@ -24,7 +24,8 @@ class UserForm extends Component {
 }
 
 UserForm.propTypes= {
-	addUser: React.PropTypes.func.isRequired
+	addUser: React.PropTypes.func.isRequired,
+	setUserName: React.PropTypes.func.isRequired
 }
 
 export default UserForm

@@ -8,19 +8,26 @@ class MessageForm extends Component {
 		const message = node.value;
 		const activeUser = this.props.activeUser
 		const activeChn= this.props.activeChannel
-		this.props.addMessage(message,activeUser.userName, activeChn);
+		//this.props.addMessage(message,activeUser.userName, activeChn);
+		this.props.addMessage(message);
 		node.value='';
 	}
 	render() {
+		let input;
+		if (this.props.activeChannel.id !==undefined ) {
+			input = (
+				<input 
+				    className='form-control'
+					type="text"
+					placeholder="Add Message"
+					ref="message" 
+				/>
+			)
+		}
 		return(
 			<form onSubmit={this.onSubmit.bind(this)}>
 				<div className='form-group'>
-					<input 
-					    className='form-control'
-						type="text"
-						placeholder="Add Message"
-						ref="message" 
-					/>
+					{input}
 				</div>
 			</form>
 		)

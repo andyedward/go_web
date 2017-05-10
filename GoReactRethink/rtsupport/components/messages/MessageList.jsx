@@ -5,10 +5,10 @@ import Message from './Message.jsx'
 class MessageList extends Component {
 	render() {
 		return(
-			<ul>{this.props.activeChannelMessages.map(activeChannelMessage =>{
+			<ul>{this.props.messages.map(message =>{
 				return <Message 
-					message= {activeChannelMessage} 
-					key = {activeChannelMessage.id}
+					message= {message} 
+					key = {message.id}
 					{...this.props}
 				/>
 

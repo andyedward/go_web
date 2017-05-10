@@ -14,6 +14,8 @@ type Client struct {
 	findHandler  FindHandler
 	session      *r.Session
 	stopChannels map[int]chan bool
+	id           string
+	userName     string
 }
 
 type Message struct {
@@ -29,7 +31,7 @@ func (c *Client) NewStopChannel(stopKey int) chan bool {
 }
 
 func (c *Client) StopForKey(key int) {
-	if ch, found := c.stopChannels[key]; {
+	if ch, found := c.stopChannels[key]; found {
 		ch <- true
 		delete(c.stopChannels, key)
 	}

@@ -42,6 +42,7 @@ class App extends Component {
 		this.setState({users});
 	}
 	onAddUser(user) {
+		console.log(user)
 		let {users} = this.state;
 		users.push(user);
 		this.setState({users});
@@ -81,7 +82,7 @@ class App extends Component {
 		users.push({id: shortid.generate(), userName})
 		this.setState({users});
 	}
-	addMessage(message, userName, channel) {
+	addMessage(body) {
 		/*let {messages} = this.state;
 		let {activeChannelMessages} = this.state;
 		var shortid = require('shortid');
@@ -89,11 +90,20 @@ class App extends Component {
 		activeChannelMessages.push({id: shortid.generate(), msg:message, user:userName, chn: channel, time: new Date().toString() })
 		this.setState({messages});*/
 
-		let {activeChannel} = this.state;
+		let {messages, users} = this.state;
+		let createdAt = new Date;
+		let author = users.length > 0 ? users[0].name: 'anonymous';
+		var shortid = require('shortid');
+		messages.push({id :shortid.generate(), body, createdAt, author});
+		console.log(messages)
+		this.setState({messages})
+
+		//Todo send to server
+		/*let {activeChannel} = this.state;
 		this.socket.emit('message add',
 		{
 			channelId: activeChannel.id, body
-		});
+		});*/
 	}
 
 	
@@ -131,8 +141,8 @@ class App extends Component {
 	setUserActive(activeUser) {
 		this.setState({activeUser})
 	}
-	setUserName(name) {
-		this.socket.emit('user edit', {name});
+	setUserName(name, id) {
+		this.socket.emit('user edit', {name, id});
 	}
 
 	render() {
@@ -147,6 +157,7 @@ class App extends Component {
 					<UserSection 
 						{...this.state}
 						addUser = {this.addUser.bind(this)}
+						setUserName = {this.setUserName.bind(this)}
 						setUserActive = {this.setUserActive.bind(this)}
 					/>
 				</div>

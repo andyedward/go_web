@@ -11,7 +11,7 @@ class User extends Component {
 		return(
 			<li className = {active}>
 				<a onClick={this.onClick.bind(this)}>
-					{this.props.user.userName}
+					{this.props.user.name} {this.props.user.id}
 				</a>
 			</li>
 		)
